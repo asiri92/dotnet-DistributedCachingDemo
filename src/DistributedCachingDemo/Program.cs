@@ -2,15 +2,22 @@ using DistributedCachingDemo.Cache;
 using DistributedCachingDemo.Caching;
 using DistributedCachingDemo.Data;
 using DistributedCachingDemo.Stores;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<FakeProductRepository>();
-builder.Services.AddSingleton<ICacheStore, InMemoryCacheStore>();
+//builder.Services.AddSingleton<ICacheStore, InMemoryCacheStore>();
 builder.Services.AddSingleton(new CacheOptions
 {
     DefaultTtl = TimeSpan.FromSeconds(30)
 });
+
+// For Redis, ensure you have a Redis server running locally on the default port (6379).
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    _ => ConnectionMultiplexer.Connect("localhost:6379"));
+builder.Services.AddSingleton<ICacheStore, RedisCacheStore>();
+
 builder.Services.AddSingleton<CacheAsideService>();
 
 builder.Services.AddLogging();
