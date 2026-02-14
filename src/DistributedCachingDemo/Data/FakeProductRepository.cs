@@ -25,4 +25,30 @@ public sealed class FakeProductRepository
         var product = _products.FirstOrDefault(p => p.Id == id);
         return Task.FromResult(product);
     }
+
+    public Task<Product?> UpdateAsync(Guid id, string name, decimal price)
+    {
+        var index = _products.FindIndex(p => p.Id == id);
+
+        if (index == -1)
+            return Task.FromResult<Product?>(null);
+
+        var updated = new Product
+        {
+            Id = id,
+            Name = name,
+            Price = price
+        };
+
+        _products[index] = updated;
+
+        return Task.FromResult<Product?>(updated);
+    }
+
+    public Task<bool> DeleteAsync(Guid id)
+    {
+        var removed = _products.RemoveAll(p => p.Id == id) > 0;
+        return Task.FromResult(removed);
+    }
+
 }

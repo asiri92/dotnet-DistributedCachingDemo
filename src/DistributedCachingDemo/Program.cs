@@ -35,5 +35,42 @@ app.MapGet("/products/{id:guid}", async (
         : Results.NotFound();
 });
 
+app.MapPut("/products/{id:guid}", async (
+    Guid id,
+    string name,
+    decimal price,
+    CacheAsideService cache,
+    FakeProductRepository repo) =>
+{
+    var updated = await repo.UpdateAsync(id, name, price);
+
+    if (updated is null)
+        return Results.NotFound();
+
+    var cacheKey = CacheKeyBuilder.Product(id);
+
+    await cache.InvalidateAsync(cacheKey);
+
+    return Results.Ok(updated);
+});
+
+app.MapDelete("/products/{id:guid}", async (
+    Guid id,
+    CacheAsideService cache,
+    FakeProductRepository repo) =>
+{
+    var deleted = await repo.DeleteAsync(id);
+
+    if (!deleted)
+        return Results.NotFound();
+
+    var cacheKey = CacheKeyBuilder.Product(id);
+
+    await cache.InvalidateAsync(cacheKey);
+
+    return Results.NoContent();
+});
+
+
 
 app.Run();
