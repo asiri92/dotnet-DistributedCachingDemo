@@ -1,4 +1,4 @@
-Distributed Caching Demo (ASP.NET Core + Redis)
+## ⚙️ Distributed Caching Demo (ASP.NET Core + Redis)
 
 ## Overview
 
